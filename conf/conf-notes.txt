@@ -1,0 +1,12 @@
+Common targets are:
+    amplitude-base-image
+    amplitude-qt-image
+    meta-toolchain-qt5
+
+You can also run generated qemu images with a command like 'runqemu qemuarm'
+
+   ___              ___ __          __   
+  / _ | __ _  ___  / (_) /___ _____/ /__ 
+ / __ |/  ' \/ _ \/ / / __/ // / _  / -_)
+/_/ |_/_/_/_/ .__/_/_/\__/\_,_/\_,_/\__/ 
+           /_/                           

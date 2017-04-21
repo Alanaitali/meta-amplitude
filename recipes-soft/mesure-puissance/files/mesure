@@ -1,0 +1,44 @@
+#!/bin/sh
+while [ -z $reponse ] || [ $reponse != 'quitter' ]
+do
+read -p "entré continu ou mesure " choix
+case $choix in
+		"continu")
+			while [ -z $com ] || [ $com != 'q' ]
+			do
+				if [ -z $1 ]|| [-z $2]
+				then
+					echo "assez pas de paramètre"
+					com=q
+				else
+        			cat $1
+				read -t 1 com
+			fi
+			done
+			;;
+		"mesure")
+			read -p "chemin absolue" path
+			cd $path
+			pwd
+			while [ -z $rep ] || [ $rep != 'q' ]
+			do
+
+				if [ -z $1 ]|| [-z $2]
+				then
+					echo "assez pas de paramètre"
+					rep=q
+				else
+					read -p "nom de la mesure" nom
+ 					f=$(sed -n 1p $1)
+					echo  $nom " : ">>$2
+					echo  $f >>$2
+					read -p "nouvelle mesure ?" rep
+				fi	
+			done
+			;;
+		*)
+			;;
+esac
+read -p "quitter ?" reponse
+done
+

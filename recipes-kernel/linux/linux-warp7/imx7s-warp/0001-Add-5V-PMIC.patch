@@ -1,0 +1,26 @@
+From 2813049b88bb561f6d08021fef7ffeb8f1e9f775 Mon Sep 17 00:00:00 2001
+From: Alan <aitali.alan@gmail.com>
+Date: Thu, 6 Apr 2017 17:08:11 +0200
+Subject: [PATCH 1/2] Add 5V PMIC
+
+Signed-off-by: Alan <aitali.alan@gmail.com>
+---
+ arch/arm/boot/dts/imx7s-warp.dts | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/boot/dts/imx7s-warp.dts b/arch/arm/boot/dts/imx7s-warp.dts
+index 0c67cad..5d61dbf 100644
+--- a/arch/arm/boot/dts/imx7s-warp.dts
++++ b/arch/arm/boot/dts/imx7s-warp.dts
+@@ -232,6 +232,8 @@
+ 			swbst_reg: swbst {
+ 				regulator-min-microvolt = <5000000>;
+ 				regulator-max-microvolt = <5150000>;
++				regulator-boot-on;
++				regulator-always-on;
+ 			};
+ 
+ 			snvs_reg: vsnvs {
+-- 
+2.7.4
+

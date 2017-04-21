@@ -1,0 +1,210 @@
+From b3ef2e42bda2f22fee8d202a6952a9272fb97d28 Mon Sep 17 00:00:00 2001
+From: Alan <aitali.alan@gmail.com>
+Date: Thu, 20 Apr 2017 15:56:54 +0200
+Subject: [PATCH] Add CAN-qt-ble
+
+Signed-off-by: Alan <aitali.alan@gmail.com>
+---
+ arch/arm/boot/dts/imx7s-warp.dts | 109 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 92 insertions(+), 17 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx7s-warp.dts b/arch/arm/boot/dts/imx7s-warp.dts
+index 0c67cad..a7268be 100644
+--- a/arch/arm/boot/dts/imx7s-warp.dts
++++ b/arch/arm/boot/dts/imx7s-warp.dts
+@@ -66,6 +66,17 @@
+ 		};
+ 	};
+ 
++	clocks {
++                /* fixed crystal dedicated to mpc251x */
++                clk10m: clk@1 {
++                        compatible = "fixed-clock";
++                        reg=<1>;
++                        #clock-cells = <0>;
++                        clock-frequency = <10000000>;
++                        clock-output-names = "clk10m";
++                };
++	}; 
++
+ 	bcmdhd_wlan_0: bcmdhd_wlan@0 {
+ 		compatible = "android,bcmdhd_wlan";
+ 		/* WL_HOST_WAKE=GPIO<5,11>, WL_REG_ON=GPIO<5,10>  */
+@@ -77,6 +88,16 @@
+ 		compatible = "simple-bus";
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
++		
++		reg_mkb_3v3: regulator@0 {
++			compatible = "regulator-fixed";
++			reg = <0>;
++			regulator-name = "mkb-3v3";
++			regulator-min-microvolt = <3300000>;
++			regulator-max-microvolt = <3300000>;
++			gpio = <&gpio7 8 GPIO_ACTIVE_LOW>;
++			regulator-boot-on;
++		};
+ 
+ 		wlreg_on: fixedregulator@100 {
+ 			compatible = "regulator-fixed";
+@@ -168,16 +189,6 @@
+ 	};
+ };
+ 
+-&mipi_dsi {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_enet2_epdc0_en>;
+-	lcd_panel = "TRULY-TDO-QVGA0150A90049";
+-	resets = <&mipi_dsi_reset>;
+-	back-light-gpios = <&gpio7 2 1>;
+-	reset-gpios = <&gpio7 6 0>;
+-	status = "okay";
+-};
+-
+ &clks {
+ 	assigned-clocks = <&clks IMX7D_PLL_AUDIO_POST_DIV>;
+ 	assigned-clock-rates = <884736000>;
+@@ -232,6 +243,8 @@
+ 			swbst_reg: swbst {
+ 				regulator-min-microvolt = <5000000>;
+ 				regulator-max-microvolt = <5150000>;
++				regulator-boot-on;
++				regulator-always-on;
+ 			};
+ 
+ 			snvs_reg: vsnvs {
+@@ -391,6 +404,16 @@
+ 	};
+ };
+ 
++&mipi_dsi {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_enet2_epdc0_en>;
++	lcd_panel = "TRULY-TDO-QVGA0150A90049";
++	resets = <&mipi_dsi_reset>;
++	back-light-gpios = <&gpio7 2 1>;
++	reset-gpios = <&gpio7 6 0>;
++	status = "okay";
++};
++
+ &uart1 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_uart1>;
+@@ -399,6 +422,14 @@
+ 	status = "okay";
+ };
+ 
++&uart6 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_uart6>;
++	assigned-clocks = <&clks IMX7D_UART6_ROOT_SRC>;
++	assigned-clock-parents = <&clks IMX7D_PLL_SYS_MAIN_240M_CLK>;
++	status = "okay";
++};
++
+ &uart3  {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_uart3>;
+@@ -445,6 +476,27 @@
+ 	status = "okay";
+ };
+ 
++&ecspi2 {
++	fsl,spi-num-chipselects = <1>;
++	cs-gpios = <&gpio4 23 GPIO_ACTIVE_LOW>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_ecspi2>;
++	status = "okay";		
++
++	can: can@0 {
++		compatible = "microchip,mcp2515";
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_can_int>;
++		reg = <0>;
++		clocks = <&clk10m>;
++		interrupt-parent = <&gpio7>;
++		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
++		spi-max-frequency = <10000000>;
++		vdd-supply = <&reg_mkb_3v3>;
++		xceiver-supply = <&reg_mkb_3v3>;
++	};
++};
++
+ &iomuxc {
+ 	pinctrl-names = "default";
+ 
+@@ -461,6 +513,12 @@
+ 			>;
+ 		};
+ 
++		pinctrl_can_int: cangrp {
++			fsl,pins = <
++				MX7D_PAD_ENET1_RGMII_TD1__GPIO7_IO7	0x14
++			>;
++		};
++
+ 		pinctrl_charger: bcgrp {
+ 			fsl,pins = <
+ 				MX7D_PAD_SD2_DATA0__GPIO5_IO14	0x14
+@@ -502,6 +560,13 @@
+ 			>;
+ 		};
+ 
++		pinctrl_uart6: uart6grp {
++			fsl,pins = <
++				MX7D_PAD_ECSPI1_SCLK__UART6_DCE_RX 0x79                     
++	 			MX7D_PAD_ECSPI1_MOSI__UART6_DCE_TX 0x79
++			>;
++		};
++
+ 		pinctrl_sai1: sai1grp {
+ 			fsl,pins = <
+ 				MX7D_PAD_SAI1_RX_DATA__SAI1_RX_DATA0 	0x1f
+@@ -591,13 +656,6 @@
+ 			>;
+ 		};
+ 
+-		pinctrl_enet2_epdc0_en: enet2_epdc0_grp {
+-			fsl,pins = <
+-			MX7D_PAD_ENET1_RGMII_RD2__GPIO7_IO2 0x00
+-			MX7D_PAD_ENET1_RGMII_TD0__GPIO7_IO6  0x00
+-			>;
+-		};
+-
+ 		pinctrl_usdhc3_200mhz: usdhc3grp_200mhz {
+ 			fsl,pins = <
+ 				MX7D_PAD_SD3_CMD__SD3_CMD	0x5b
+@@ -614,6 +672,16 @@
+ 			>;
+ 		};
+ 
++		pinctrl_ecspi2: ecspi2grp {
++			fsl,pins = <
++				MX7D_PAD_ECSPI2_MISO__ECSPI2_MISO          0x00000014
++				MX7D_PAD_ECSPI2_MOSI__ECSPI2_MOSI          0x00000014
++				MX7D_PAD_ECSPI2_SCLK__ECSPI2_SCLK          0x00000014
++				MX7D_PAD_ENET1_RGMII_TD2__GPIO7_IO8        0x59	/*3.3*/
++				MX7D_PAD_ECSPI2_SS0__GPIO4_IO23            0x00000014/*CS*/
++			>;
++		};
++
+ 		pinctrl_lcdif_dat: lcdifdatgrp {
+ 			fsl,pins = <
+ 				MX7D_PAD_LCD_DATA00__LCD_DATA0	0x79
+@@ -643,6 +711,13 @@
+ 			>;
+ 		};
+ 
++		pinctrl_enet2_epdc0_en: enet2_epdc0_grp {
++			fsl,pins = <
++				MX7D_PAD_ENET1_RGMII_RD2__GPIO7_IO2 0x00
++				MX7D_PAD_ENET1_RGMII_TD0__GPIO7_IO6  0x00
++			>;
++		};
++
+ 		pinctrl_lcdif_ctrl: lcdifctrlgrp {
+ 			fsl,pins = <
+ 				MX7D_PAD_LCD_CLK__LCD_CLK	0x79
+-- 
+2.7.4
+
