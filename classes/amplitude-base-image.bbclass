@@ -33,6 +33,7 @@ IMAGE_INSTALL += " \
 	packagegroup-machine-base \
 	packagegroup-amplitude-base \
 	packagegroup-tools-io \
+	mosquitto \
     	${CORE_IMAGE_EXTRA_INSTALL} \
 "
 

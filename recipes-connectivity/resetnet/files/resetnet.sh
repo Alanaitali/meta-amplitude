@@ -1,5 +1,5 @@
 #!/bin/sh
-
+/usr/bin/diode
 while true ; do
 	/usr/bin/testbtn
 
@@ -9,7 +9,7 @@ while true ; do
 		echo 2 > /sys/module/bcmdhd/parameters/op_mode
 		/etc/init.d/networking restart
 		/etc/init.d/dnsmasq restart
-		/etc/init.d/hostapd restart                               
+		/etc/init.d/hostapd restart
+		echo heartbeat > /sys/class/leds/warp7\:heartbeat/trigger                            
 	fi
 done &
-	

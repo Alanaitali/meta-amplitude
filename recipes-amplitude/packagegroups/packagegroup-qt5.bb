@@ -15,5 +15,7 @@ RDEPENDS_${PN} = " \
 	qtscript \
 	qtserialport \
 	qtconnectivity \
+	qtserialbus \
+	qtwebkit \
 "
 

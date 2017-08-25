@@ -6,17 +6,26 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d
 inherit packagegroup
 
 RDEPENDS_${PN} = "\
+	alsa-utils \
+	alsa-tools \
     	gdb  \
     	dnsmasq \
     	hostapd \
     	dbus \
     	sysfsutils \
 	hostapd \
+	mosquitto \
+    	mosquitto-clients \
+    	libmosquitto1 \
+	libmosquittopp1 \
 	dnsmasq \
 	bluez5 \
+	qmqtt \
 	resetnet \
 	init-ifupdown \
+	resetnet \
 	swupdate \
         swupdate-www \
 	canutils \
+	gdbserver \
 "
